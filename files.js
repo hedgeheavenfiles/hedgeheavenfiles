@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
-const ignored = ['index.html', 'files.json', 'files.js', 'README.md', 'functions'];
+const ignored = ['index.html', 'files.json', 'files.js', 'README.md', 'functions', '.git'];
 
 function getGitMtime(filePath) {
   try {
@@ -13,7 +13,7 @@ function getGitMtime(filePath) {
   }
 }
 
-function generateIndexHTML(dir) {
+function generateIndexHTML() {
   return `<!DOCTYPE html>
 <html>
 <head>
@@ -91,7 +91,7 @@ fetch('files.json')
 </html>`;
 }
 
-function generateIndex(dir, baseDir) {
+function generateIndex(dir) {
   const entries = fs.readdirSync(dir, { withFileTypes: true });
   const files = entries
     .filter(e => !ignored.includes(e.name) && !e.name.startsWith('.'))
@@ -107,12 +107,29 @@ function generateIndex(dir, baseDir) {
     });
 
   fs.writeFileSync(path.join(dir, 'files.json'), JSON.stringify(files, null, 2));
-  fs.writeFileSync(path.join(dir, 'index.html'), generateIndexHTML(dir));
-  console.log('Generated:', path.join(dir, 'index.html'));
+  fs.writeFileSync(path.join(dir, 'index.html'), generateIndexHTML());
 
-  entries.filter(e => e.isDirectory() && !ignored.includes(e.name)).forEach(e => {
-    generateIndex(path.join(dir, e.name), baseDir);
+  entries.filter(e => e.isDirectory() && !ignored.includes(e.name) && !e.name.startsWith('.')).forEach(e => {
+    generateIndex(path.join(dir, e.name));
   });
 }
 
-generateIndex('./', './');
+const rootEntries = fs.readdirSync('./', { withFileTypes: true });
+const rootFiles = rootEntries
+  .filter(e => !ignored.includes(e.name) && !e.name.startsWith('.'))
+  .map(e => {
+    const fullPath = path.join('./', e.name);
+    const stat = fs.statSync(fullPath);
+    return {
+      name: e.name,
+      isDir: e.isDirectory(),
+      size: e.isFile() ? stat.size : null,
+      mtime: getGitMtime(fullPath) || stat.mtime.toISOString(),
+    };
+  });
+
+fs.writeFileSync('./files.json', JSON.stringify(rootFiles, null, 2));
+
+rootEntries.filter(e => e.isDirectory() && !ignored.includes(e.name) && !e.name.startsWith('.')).forEach(e => {
+  generateIndex(e.name);
+});
