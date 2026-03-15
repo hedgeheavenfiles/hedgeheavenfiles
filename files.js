@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const ignored = ['index.html', 'files.json', 'files.js', 'README.md'];
+const ignored = ['index.html', 'files.json', 'files.js', 'README.md', 'new/_template'];
 
 function generateIndex(dir, baseDir) {
   const entries = fs.readdirSync(dir, { withFileTypes: true });
