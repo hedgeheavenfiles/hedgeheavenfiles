@@ -13,7 +13,7 @@ function getGitMtime(filePath) {
   }
 }
 
-function generateIndexHTML() {
+function generateIndexHTML(dir) {
   return `<!DOCTYPE html>
 <html>
 <head>
@@ -91,7 +91,7 @@ fetch('files.json')
 </html>`;
 }
 
-function generateIndex(dir) {
+function generateIndex(dir, baseDir) {
   const entries = fs.readdirSync(dir, { withFileTypes: true });
   const files = entries
     .filter(e => !ignored.includes(e.name) && !e.name.startsWith('.'))
@@ -107,30 +107,13 @@ function generateIndex(dir) {
     });
 
   fs.writeFileSync(path.join(dir, 'files.json'), JSON.stringify(files, null, 2));
-  fs.writeFileSync(path.join(dir, 'index.html'), generateIndexHTML());
+  fs.writeFileSync(path.join(dir, 'index.html'), generateIndexHTML(dir));
   console.log('Generated:', path.join(dir, 'index.html'));
 
-  entries.filter(e => e.isDirectory() && !ignored.includes(e.name) && !e.name.startsWith('.')).forEach(e => {
-    generateIndex(path.join(dir, e.name));
-  });
+const rootEntries = fs.readdirSync('./', { withFileTypes: true });
+rootEntries.filter(e => e.isDirectory() && !ignored.includes(e.name) && !e.name.startsWith('.')).forEach(e => {
+  generateIndex(e.name, e.name);
+});
 }
 
-const rootEntries = fs.readdirSync('./', { withFileTypes: true });
-const rootFiles = rootEntries
-  .filter(e => !ignored.includes(e.name) && !e.name.startsWith('.'))
-  .map(e => {
-    const fullPath = path.join('./', e.name);
-    const stat = fs.statSync(fullPath);
-    return {
-      name: e.name,
-      isDir: e.isDirectory(),
-      size: e.isFile() ? stat.size : null,
-      mtime: getGitMtime(fullPath) || stat.mtime.toISOString(),
-    };
-  });
-
-fs.writeFileSync('./files.json', JSON.stringify(rootFiles, null, 2));
-
-rootEntries.filter(e => e.isDirectory() && !ignored.includes(e.name) && !e.name.startsWith('.')).forEach(e => {
-  generateIndex(e.name);
-});
+generateIndex('./', './');
