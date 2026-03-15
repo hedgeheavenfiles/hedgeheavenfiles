@@ -110,10 +110,9 @@ function generateIndex(dir, baseDir) {
   fs.writeFileSync(path.join(dir, 'index.html'), generateIndexHTML(dir));
   console.log('Generated:', path.join(dir, 'index.html'));
 
-const rootEntries = fs.readdirSync('./', { withFileTypes: true });
-rootEntries.filter(e => e.isDirectory() && !ignored.includes(e.name) && !e.name.startsWith('.')).forEach(e => {
-  generateIndex(e.name, e.name);
-});
+  entries.filter(e => e.isDirectory() && !ignored.includes(e.name)).forEach(e => {
+    generateIndex(path.join(dir, e.name), baseDir);
+  });
 }
 
 generateIndex('./', './');
