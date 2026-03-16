@@ -48,8 +48,10 @@ function generateIndexHTML() {
   </tbody>
 </table>
 <hr>
-<address id="address">hedgeheavenfiles.pages.dev</address><address>An archive of the HedgeHeaven servers.</adress>
-<adress>Not related to anything else.</adress></address><address id="footer">&copy; HedgeHeaven 2026</address>
+<address id="address">hedgeheavenfiles.pages.dev</address>
+<address>An archive of the HedgeHeaven servers.</address>
+<address>Not related to anything else.</address>
+<address id="footer">&copy; HedgeHeaven 2026</address>
 <script>
 const title = document.getElementById('title');
 const listing = document.getElementById('listing');
