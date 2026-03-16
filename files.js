@@ -48,7 +48,7 @@ function generateIndexHTML() {
   </tbody>
 </table>
 <hr>
-<address id="address">hedgeheavenfiles.pages.dev</address><address id="footer">&copy; Anakama 2026</address>
+<address id="address">hedgeheavenfiles.pages.dev</address><address>An archive of the HedgeHeaven servers.</adress><adress>Any similiarity to real-world events are coincidences.</adresses></address><address id="footer">&copy; Anakama 2026</address>
 <script>
 const title = document.getElementById('title');
 const listing = document.getElementById('listing');
